@@ -1,8 +1,23 @@
 repos:
+-   repo: local
+    hooks:
+    -   id: branch-protection
+        name: branch-protection
+        entry: python custom_rules.py
+        language: python
+        stages:
+        -   pre-commit
+        -   pre-push
+
 -   repo: https://github.com/psf/black
     rev: 24.10.0
     hooks:
     -   id: black
+
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.13.0
+    hooks:
+    -   id: isort
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -14,15 +29,15 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0  # Use the ref you want to point at
+    rev: v1.10.0
     hooks:
     -   id: python-no-eval
 
-- repo: https://github.com/compilerla/conventional-pre-commit
-  rev: v3.6.0
-  hooks:
-    - id: conventional-pre-commit
-      stages: [commit-msg]
-      args: [--strict, ]
+-   repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.6.0
+    hooks:
+    -   id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [--strict, ]
 
 default_install_hook_types: [pre-commit, pre-push, commit-msg]
