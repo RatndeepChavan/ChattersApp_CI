@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('All installation checks') {
+            steps {
+                sh '/dependency-check/bin/dependency-check.sh -v'
+                sh '/depscan-linux-musl -v'
+                sh '/snyk-alpine -v'
+                sh 'trivy -v'
+                sh 'docker -v'
+                sh '/docker-compose-linux-x86_64 -v'
+            }
+        }
+        stage('Git') {
+            steps {
+                git branch: 'production', changelog: false, poll: false, url: 'https://github.com/RatndeepChavan/ChattersApp.git'
+            }
+        }
+        stage('OWASP dependanct-check') {
+            steps {
+                sh '/dependency-check/bin/dependency-check.sh --advancedHelp --prettyPrint --disableNodeJS -s package-lock.json -s client/package-lock.json -s server/package-lock.json'
+            }
+        }
+        stage('Snyk') {
+            environment {
+                SNYK_SECRET = credentials('snyk-secret')
+
+            }
+            steps {
+                sh '/snyk-alpine auth $SNYK_SECRET'
+                sh '/snyk-alpine test --all-projects'
+            }
+        }
+        stage('Trivy') {
+            steps {
+                sh 'trivy fs . --skip-dirs server/logs --skip-dirs server/docs --skip-dirs client/docs'
+            }
+        }
+        stage('Image build') {
+            steps {
+                sh '/docker-compose-linux-x86_64 build'
+            }
+        }
+        stage('Image scan') {
+            steps {
+                sh 'trivy image ratndeep/chattersapp_frontend:v1.0'
+                sh 'trivy image ratndeep/chattersapp_backend:v1.0'
+            }
+        }
+    }
+}
