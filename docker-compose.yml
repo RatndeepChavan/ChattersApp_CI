@@ -1,0 +1,33 @@
+services:
+    jenkins:
+        image: jenkins/jenkins:alpine
+        container_name: jenkins
+        restart: on-failure
+        ports:
+            - 8080:8080
+            - 50000:50000
+        # Passed uid:gid to allow user to use docker
+        # user: "UID:GID"
+        # UID : root user id (echo $UID)
+        # GID : docker group id (getent group docker | cut -d: -f3)
+        # NOTE: use command specified in bracket to get uid and gid
+        volumes:
+            - ./data:/var/jenkins_home
+#
+# - /var/run/docker.sock:/var/run/docker.sock
+# - /usr/bin/docker:/usr/bin/docker
+# networks:
+# - jenkins_network
+# networks:
+# jenkins_network:
+# driver: bridge
+#      sonar_qube:
+#      image: sonarqube:community
+#      container_name: sonar
+#      restart: always
+#      ports:
+#        - 9000:9000
+#      volumes:
+#        - ./sonar/data:/opt/sonarqube/data
+#        - ./sonar/extensions:/opt/sonarqube/extensions
+#        - ./sonar/logs:/opt/sonarqube/logs
